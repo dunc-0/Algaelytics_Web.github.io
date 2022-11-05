@@ -5,11 +5,9 @@ jQuery(document).ready(function ($) {
     // Notification list
     // ============================================================== 
     if ($(".notification-list").length) {
-
         $('.notification-list').slimScroll({
             height: '250px'
         });
-
     }
 
     // ============================================================== 
@@ -19,7 +17,6 @@ jQuery(document).ready(function ($) {
 
     if ($(".menu-list").length) {
         $('.menu-list').slimScroll({
-
         });
     }
 
@@ -72,9 +69,7 @@ jQuery(document).ready(function ($) {
     // tooltip
     // ============================================================== 
     if ($('[data-toggle="tooltip"]').length) {
-
         $('[data-toggle="tooltip"]').tooltip()
-
     }
 
     // ============================================================== 
@@ -82,7 +77,6 @@ jQuery(document).ready(function ($) {
     // ============================================================== 
     if ($('[data-toggle="popover"]').length) {
         $('[data-toggle="popover"]').popover()
-
     }
 
     // ============================================================== 
@@ -112,12 +106,6 @@ function changeLoginToLogoutURL() {
     document.getElementById("loginBtn").href = "https://algaelytics.auth.ca-central-1.amazoncognito.com/logout?client_id=rr1puarvl8edm9e4ofmocfrjf&logout_uri=http://localhost:8080";
 }
 
-function appendTokenToURL(){
-    var url_string = window.location.href;
-    document.getElementById("a-realtime").href = "/realtime.html/" + url_string.substring(url_string.indexOf("#"));
-    document.getElementById("a-map").href = "/map.html/" + url_string.substring(url_string.indexOf("#"));
-
-}
 
 // ============================================================== 
 // aws stuff
@@ -138,7 +126,6 @@ function checkLogin() {
         document.getElementById("signinName").innerHTML = parsedIdToken.name;
         document.getElementById("loginBtn").innerHTML = "<i class=\"fas fa-power-off mr-2\"></i>Logout";
         document.getElementById("pageContent").style.display = "block";
-        appendTokenToURL();
         changeLoginToLogoutURL();
         auth();
     } else {

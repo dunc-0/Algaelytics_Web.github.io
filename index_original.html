@@ -1,0 +1,80 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/shared.css" />
+    <link rel="icon" type="image/x-icon" href="/images/logo small.ico">
+    <title>Algaelytics 🚧 Under Construction 🚧</title>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.7.16.min.js"></script>
+    <script src="/js/aws-cognito-sdk.min.js"></script>
+    <script src="/js/amazon-cognito-identity.min.js"></script>
+</head>
+
+<body onLoad="checkLogin()">
+    <img src="images\Logo.png" alt="Algaelytics logo" class="center">
+
+    <div id="welcomeMsg"></div>
+    
+    <br>
+
+    <a href="https://algaelytics.auth.ca-central-1.amazoncognito.com/login?client_id=rr1puarvl8edm9e4ofmocfrjf&response_type=token&scope=phone+email+openid+aws.cognito.signin.user.admin+profile&redirect_uri=https://algaelytics-web.s3.ca-central-1.amazonaws.com/index.html">Login</a>
+
+    <br><br>
+
+    <input type="button" value="ReadItem" onclick="readItem();"/>
+    <br><br>
+    <textarea readonly id="textarea" style="width:400px; height:600px;"></textarea>
+
+
+
+    <script>
+
+        var idToken = null;
+
+        function checkLogin() {
+            var url_string = window.location.href;
+            var url = new URL(url_string);
+            idToken = url.searchParams.get("id_token");
+            if (idToken != null) {
+                document.getElementById("welcomeMsg").innerHTML = "signed in";
+                auth();
+            }
+        }
+
+        function auth() {
+            AWS.config.update({
+                region: "ca-central-1",
+            });
+
+            AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+                IdentityPoolId: 'ca-central-1:c0f6e0de-7f28-4daf-b773-8dc9bcbf0127',
+                Logins: {
+                    "cognito-idp.ca-central-1.amazonaws.com/ca-central-1_s3VpKETXG": idToken
+                }
+            });
+        }
+
+        function readItem() {
+
+            var docClient = new AWS.DynamoDB.DocumentClient();
+
+            var params = {
+                TableName: "SensorStor",
+                Key: {
+                    "EventID": "80ad1045-b637-4901-ab86-eb654a75ad2a", // Partition Key
+                }
+            };
+            docClient.get(params, function (err, data) {
+                if (err) {
+                    document.getElementById('textarea').innerHTML = "Unable to read item: " + "\n" + JSON.stringify(err, undefined, 2);
+                } else {
+                    document.getElementById('textarea').innerHTML = "GetItem succeeded: " + "\n" + JSON.stringify(data, undefined, 2);
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

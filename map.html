@@ -89,23 +89,25 @@
                                 Menu
                             </li>
                             <li class="nav-item ">
-                                <a class="nav-link active" href="#" data-toggle="collapse" aria-expanded="false"
+                                <a class="nav-link" href="#" data-toggle="collapse" aria-expanded="false"
                                     data-target="#submenu-1" aria-controls="submenu-1"><i
                                         class="fa fa-fw fa-tachometer-alt"></i>Dashboard <span
                                         class="badge badge-success">6</span></a>
                                 <div id="submenu-1" class="collapse submenu" style="">
                                     <ul class="nav flex-column">
                                         <li class="nav-item">
-                                            <a id="a-realtime" class="nav-link" href="/realtime.html">Realtime</a>
-                                        </li>
-                                        <li class="nav-item">
                                             <a id="a-index" class="nav-link" href="/index.html">Historical</a>
                                         </li>
+                                        <li class="nav-item">
+                                            <a id="a-realtime" class="nav-link" href="/realtime.html">Realtime</a>
+                                        </li>
+                                        
                                     </ul>
                                 </div>
                             </li>
                             <li class="nav-item">
-                                <a id="a-map" class="nav-link" href="/map.html"><i class="fas fa-fw fa-map"></i>Device Map</a>
+                                <a id="a-map" class="nav-link active" href="/map.html"><i
+                                        class="fas fa-fw fa-map"></i>Device Map</a>
                             </li>
 
                             <li class="nav-item">
@@ -180,15 +182,14 @@
                     <div class="row">
                         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                             <div class="page-header">
-                                <h2 class="pageheader-title">Historical Dashboard</h2>
+                                <h2 class="pageheader-title">Device Map</h2>
                                 <p class="pageheader-text">Nulla euismod urna eros, sit amet scelerisque torton lectus
                                     vel mauris facilisis faucibus at enim quis massa lobortis rutrum.</p>
                                 <div class="page-breadcrumb">
                                     <nav aria-label="breadcrumb">
                                         <ol class="breadcrumb">
-                                            <li class="breadcrumb-item"><a href="#"
-                                                    class="breadcrumb-link">Dashboard</a></li>
-                                            <li class="breadcrumb-item active" aria-current="page">Historical Dashboard</li>
+                                            <li class="breadcrumb-item"><a href="#" class="breadcrumb-link">Device
+                                                    Map</a></li>
                                         </ol>
                                     </nav>
                                 </div>
@@ -200,6 +201,7 @@
                     <!-- ============================================================== -->
                     <div id="pageContent" style="display: none;">
                         <div class="ecommerce-widget">
+
 
                             <div class="row">
                                 <!-- ============================================================== -->
@@ -218,12 +220,6 @@
                                                         <option value="864475040553264">864475040553264</option>
                                                     </select>
                                                 </div>
-                                                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
-                                                    <label for="datetimes">Date and Time Range</label>
-                                                    <input type="text" id="datetimes" name="datetimes"
-                                                        class="form-control">
-                                                    </input>
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -233,74 +229,23 @@
                                 <!-- ============================================================== -->
                             </div>
 
-
                             <div class="row">
-
                                 <!-- ============================================================== -->
-                                <!-- line chart  -->
+                                <!-- map -->
                                 <!-- ============================================================== -->
-                                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                                     <div class="card">
-                                        <h5 class="card-header">Air and Water Temperatures</h5>
+                                        <h5 class="card-header">Google Maps</h5>
                                         <div class="card-body">
-                                            <canvas id="temperaturegraph"></canvas>
+                                            <div id="map" class="gmaps"></div>
                                         </div>
                                     </div>
                                 </div>
                                 <!-- ============================================================== -->
-                                <!-- end line chart  -->
+                                <!-- end map  -->
                                 <!-- ============================================================== -->
-
-                                <!-- ============================================================== -->
-                                <!-- line chart  -->
-                                <!-- ============================================================== -->
-                                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
-                                    <div class="card">
-                                        <h5 class="card-header">Humidity</h5>
-                                        <div class="card-body">
-                                            <canvas id="humiditygraph"></canvas>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- ============================================================== -->
-                                <!-- end line chart  -->
-                                <!-- ============================================================== -->
-
-
                             </div>
 
-                            <div class="row">
-
-                                <!-- ============================================================== -->
-                                <!-- line chart  -->
-                                <!-- ============================================================== -->
-                                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
-                                    <div class="card">
-                                        <h5 class="card-header">Salinity Levels</h5>
-                                        <div class="card-body">
-                                            <canvas id="salinitygraph"></canvas>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- ============================================================== -->
-                                <!-- end line chart  -->
-                                <!-- ============================================================== -->
-
-                                <!-- ============================================================== -->
-                                <!-- line chart  -->
-                                <!-- ============================================================== -->
-                                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
-                                    <div class="card">
-                                        <h5 class="card-header">pH Levels</h5>
-                                        <div class="card-body">
-                                            <canvas id="pHgraph"></canvas>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- ============================================================== -->
-                                <!-- end line chart  -->
-                                <!-- ============================================================== -->
-                            </div>
 
                             <!-- ============================================================== -->
                             <!-- simple database read function  -->
@@ -322,8 +267,6 @@
                             <!-- ============================================================== -->
                             <!-- end simple database read function  -->
                             <!-- ============================================================== -->
-
-
 
 
                         </div>
@@ -375,11 +318,15 @@
     <!-- charts -->
     <script src="/assets/vendor/charts/charts-bundle/Chart.bundle.js"></script>
     <script src="/assets/vendor/charts/charts-bundle/chartjs.js"></script>
+    <!-- google maps -->
+    <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD0wRLtwUT3KzNZs8DCA6EslndmpPNsYAw&callback=initMap"></script>
     <!-- main js -->
-    <script src="/assets/libs/js/main-js.js"></script>
+    <script src="../assets/libs/js/map.js"></script>
     <!-- date time range picker -->
     <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    
+    
 
 </body>
 

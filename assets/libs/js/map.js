@@ -112,11 +112,12 @@ function changeLoginToLogoutURL() {
     document.getElementById("loginBtn").href = "https://algaelytics.auth.ca-central-1.amazoncognito.com/logout?client_id=rr1puarvl8edm9e4ofmocfrjf&logout_uri=http://localhost:8080";
 }
 
-function appendTokenToURL(){
+function appendTokenToURL() {
     var url_string = window.location.href;
     document.getElementById("a-realtime").href = "/realtime.html/" + url_string.substring(url_string.indexOf("#"));
     document.getElementById("a-map").href = "/map.html/" + url_string.substring(url_string.indexOf("#"));
     document.getElementById("a-index").href = "/index.html/" + url_string.substring(url_string.indexOf("#"));
+
 }
 
 // ============================================================== 
@@ -188,33 +189,23 @@ function parseJwt(token) {
     return JSON.parse(jsonPayload);
 }
 
-$(function () {
-    getData();
-    $.ajaxSetup({ cache: false });
-    setInterval(getData, 300000);
-});
-
-
 /* Makes a scan of the DynamoDB table to set a data object for the chart */
 function getData() {
 
     var docClient = new AWS.DynamoDB.DocumentClient();
     var params = {
         TableName: 'hubData',
-        KeyConditionExpression: 'deviceID = :part AND #timestamp BETWEEN :t1 AND :t2',
-        ProjectionExpression: "#timestamp, #tempWater, #tempAir, #humidity, #salinity",
+        KeyConditionExpression: 'deviceID = :part',
+        ProjectionExpression: "#timestamp, #lat, #lon",
         ExpressionAttributeNames: {
             "#timestamp": "timestamp",
-            "#tempWater": "tempWater",
-            "#tempAir": "tempAir",
-            "#humidity": "humidity",
-            "#salinity": "salinity",
+            "#lat": "lat",
+            "#lon": "lon",
         },
+        ScanIndexForward: false,
+        Limit: 1,
         ExpressionAttributeValues: {
             ":part": "864475040553264",
-            ":t1": String($('#datetimes').data('daterangepicker').startDate.unix()),
-            ":t2": String($('#datetimes').data('daterangepicker').endDate.unix()),
-
         }
     };
 
@@ -224,172 +215,55 @@ function getData() {
             return null;
         } else {
             document.getElementById('textarea').innerHTML = "Query succeeded: " + "\n" + JSON.stringify(data, undefined, 2);
-
-            // placeholders for the data arrays
-            var tempWaterVals = [];
-            var tempAirVals = [];
-            var humidityVals = [];
-            var salinityVals = [];
-            var pHVals = [];
-            var labelVals = [];
-
-            // placeholders for the data read
-            var tempAir = 0.0;
-            var tempWater = 0.0;
-            var humidity = 0.0;
-            var salinity = 0.0;
-            var pH = 0.0;
-            var time = "";
-
-            for (var i in data['Items']) {
-                // read the values from the dynamodb JSON packet
-                tempWater = parseFloat(data['Items'][i]['tempWater']);
-                tempAir = parseFloat(data['Items'][i]['tempAir']);
-                humidity = parseFloat(data['Items'][i]['humidity']);
-                salinity = parseFloat(data['Items'][i]['salinity']);
-                pH = 7.8 + 0.06 * Math.floor(Math.random() * 10);
-                var timestamp = new Date(0);
-                timestamp.setUTCSeconds(parseFloat(data['Items'][i]['timestamp']));
-
-                // append the read data to the data arrays
-                tempWaterVals.push(tempWater);
-                tempAirVals.push(tempAir);
-                humidityVals.push(humidity);
-                salinityVals.push(salinity);
-                pHVals.push(pH);
-                labelVals.push(timestamp);
-            }
-
-            // set the chart object data and label arrays
-            temperaturegraph.data.labels = labelVals;
-            humiditygraph.data.labels = labelVals;
-            salinitygraph.data.labels = labelVals;
-            pHgraph.data.labels = labelVals;
-            temperaturegraph.data.datasets[0].data = tempWaterVals;
-            temperaturegraph.data.datasets[1].data = tempAirVals;
-            humiditygraph.data.datasets[0].data = humidityVals;
-            salinitygraph.data.datasets[0].data = salinityVals;
-            pHgraph.data.datasets[0].data = pHVals;
-
-            // redraw the graph canvas
-            temperaturegraph.update();
-            humiditygraph.update();
-            salinitygraph.update();
-            pHgraph.update();
+            var latVal = parseFloat(data['Items'][0]['lat']);
+            var lonVal = parseFloat(data['Items'][0]['lon']);
+            var timestamp = new Date(0);
+            timestamp.setUTCSeconds(parseFloat(data['Items'][0]['timestamp']));
+        
+            const contentString =
+                '<div>' +
+                '<h5 id="firstHeading" class="firstHeading">' + "864475040553264" + '</h5>' +
+                '<div id="bodyContent">' +
+                "<p>Last update time: " + String(timestamp) + "</p>" +
+                "</div>";
+        
+            const infowindow = new google.maps.InfoWindow({
+                content: contentString,
+                ariaLabel: "864475040553264",
+            });
+        
+            const marker = new google.maps.Marker({
+                position: {
+                    lat: latVal,
+                    lng: lonVal,
+                },
+                map,
+                title: "864475040553264",
+            });
+        
+            marker.addListener("click", () => {
+                infowindow.open({
+                    anchor: marker,
+                    map,
+                });
+            });
         }
     });
+
+
 }
 
-/* Create the context for applying the chart to the HTML canvas */
-var tctx = $("#temperaturegraph").get(0).getContext("2d");
-var hctx = $("#humiditygraph").get(0).getContext("2d");
-var sctx = $("#salinitygraph").get(0).getContext("2d");
-var pHctx = $("#pHgraph").get(0).getContext("2d");
+let map;
 
-
-/* Set the options for our line charts */
-var options = {
-    legend: {
-        display: true,
-        position: 'bottom',
-        labels: {
-            fontColor: '#71748d',
-            fontFamily: 'Circular Std Book',
-            fontSize: 14,
-        }
-    },
-    responsive: true,
-    showLines: true,
-    scales: {
-        xAxes: [{
-            ticks: {
-                display: false,
-                fontSize: 14,
-                fontFamily: 'Circular Std Book',
-                fontColor: '#71748d',
-            }
-        }],
-        yAxes: [{
-            ticks: {
-                fontSize: 14,
-                fontFamily: 'Circular Std Book',
-                fontColor: '#71748d',
-            }
-        }]
-    }
-};
-
-/* Set the inital data */
-var t_init = {
-    labels: [],
-    datasets: [
-        {
-            label: "Water Temperature °C",
-            backgroundColor: "rgba(89, 105, 255,0.5)",
-            borderColor: "rgba(89, 105, 255,0.7)",
-            borderWidth: 2,
-            data: []
+function initMap() {
+    map = new google.maps.Map(document.getElementById("map"), {
+        center: {
+            lat: 48.47339545086138, 
+            lng: -123.23257108189898
         },
-        {
-            label: "Air Temperature °C",
-            backgroundColor: "rgba(255, 64, 123,0.5)",
-            borderColor: "rgba(255, 64, 123,0.7)",
-            borderWidth: 2,
-            data: []
-        },
-    ]
-};
+        zoom: 6,
+    });
 
-/* Set the inital data */
-var h_init = {
-    labels: [],
-    datasets: [
-        {
-            label: "Air Humidity %",
-            backgroundColor: "rgba(40, 200, 80, 0.5)",
-            borderColor: "rgba(40, 200, 80, 0.7)",
-            borderWidth: 2,
-            data: []
-        }
-    ]
-};
+}
 
-/* Set the inital data */
-var s_init = {
-    labels: [],
-    datasets: [
-        {
-            label: "Salinity ppm",
-            backgroundColor: "rgba(40, 200, 80, 0.5)",
-            borderColor: "rgba(40, 200, 80, 0.7)",
-            borderWidth: 2,
-            data: []
-        }
-    ]
-};
-
-/* Set the inital data */
-var pH_init = {
-    labels: [],
-    datasets: [
-        {
-            label: "pH Level",
-            borderColor: "rgba(50, 50, 50, 0.7)",
-            backgroundColor: "rgba(50, 50, 50, 0.5)",
-            borderWidth: 2,
-            data: [],
-        }
-    ]
-};
-
-var temperaturegraph = new Chart.Line(tctx, { data: t_init, options: options });
-var humiditygraph = new Chart.Line(hctx, { data: h_init, options: options });
-var salinitygraph = new Chart.Line(sctx, { data: s_init, options: options });
-var pHgraph = new Chart.Line(pHctx, { data: pH_init, options: options });
-
-$('#datetimes').on('apply.daterangepicker', function (ev, picker) {
-    console.log("start: " + picker.startDate.unix());
-    console.log("end: " + picker.endDate.unix());
-    timerangeStart = String(picker.startDate.unix());
-    timerangeEnd = String(picker.endDate.unix());
-});
+window.initMap = initMap;

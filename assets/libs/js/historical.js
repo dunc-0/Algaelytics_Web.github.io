@@ -100,23 +100,20 @@ jQuery(document).ready(function ($) {
 }); // END OF JQUERY
 
 
-
-
-
 // ============================================================== 
 // stuff
 // ============================================================== 
 
 function changeLoginToLogoutURL() {
     document.getElementById("loginBtn").href = "https://algaelytics.auth.ca-central-1.amazoncognito.com/logout?client_id=rr1puarvl8edm9e4ofmocfrjf&logout_uri=https://algaelytics-web.s3.ca-central-1.amazonaws.com/index.html";
-    document.getElementById("loginBtn").href = "https://algaelytics.auth.ca-central-1.amazoncognito.com/logout?client_id=rr1puarvl8edm9e4ofmocfrjf&logout_uri=http://localhost:8080";
+    //document.getElementById("loginBtn").href = "https://algaelytics.auth.ca-central-1.amazoncognito.com/logout?client_id=rr1puarvl8edm9e4ofmocfrjf&logout_uri=http://localhost:8080";
 }
 
-function appendTokenToURL(){
+function appendTokenToURL() {
     var url_string = window.location.href;
-    document.getElementById("a-realtime").href = "/realtime.html/" + url_string.substring(url_string.indexOf("#"));
-    document.getElementById("a-map").href = "/map.html/" + url_string.substring(url_string.indexOf("#"));
-    document.getElementById("a-index").href = "/index.html/" + url_string.substring(url_string.indexOf("#"));
+    document.getElementById("a-index").href = "/index.html" + url_string.substring(url_string.indexOf("#"));
+    document.getElementById("a-map").href = "/map.html" + url_string.substring(url_string.indexOf("#"));
+    document.getElementById("a-historical").href = "/historical.html" + url_string.substring(url_string.indexOf("#"));
 }
 
 // ============================================================== 
@@ -138,6 +135,7 @@ function checkLogin() {
         document.getElementById("signinName").innerHTML = parsedIdToken.name;
         document.getElementById("loginBtn").innerHTML = "<i class=\"fas fa-power-off mr-2\"></i>Logout";
         document.getElementById("pageContent").style.display = "block";
+        document.getElementById("loginSplash").style.display = "none";
         appendTokenToURL();
         changeLoginToLogoutURL();
         auth();
@@ -147,6 +145,7 @@ function checkLogin() {
         document.getElementById("signinName").innerHTML = "-";
         document.getElementById("loginBtn").innerHTML = "<i class=\"fas fa-power-off mr-2\"></i>Login";
         document.getElementById("pageContent").style.display = "none";
+        document.getElementById("loginSplash").style.display = "block";
     }
 }
 
@@ -188,13 +187,6 @@ function parseJwt(token) {
     return JSON.parse(jsonPayload);
 }
 
-$(function () {
-    getData();
-    $.ajaxSetup({ cache: false });
-    setInterval(getData, 300000);
-});
-
-
 /* Makes a scan of the DynamoDB table to set a data object for the chart */
 function getData() {
 
@@ -202,19 +194,21 @@ function getData() {
     var params = {
         TableName: 'hubData',
         KeyConditionExpression: 'deviceID = :part AND #timestamp BETWEEN :t1 AND :t2',
-        ProjectionExpression: "#timestamp, #tempWater, #tempAir, #humidity, #salinity",
+        ProjectionExpression: "#timestamp, #tempWater, #tempAir, #humidity, #salinity, #curSpd, #pH, #waves",
         ExpressionAttributeNames: {
             "#timestamp": "timestamp",
             "#tempWater": "tempWater",
             "#tempAir": "tempAir",
             "#humidity": "humidity",
             "#salinity": "salinity",
+            "#curSpd": "curSpd",
+            "#waves": "waves",
+            "#pH": "pH",
         },
         ExpressionAttributeValues: {
             ":part": "864475040553264",
             ":t1": String($('#datetimes').data('daterangepicker').startDate.unix()),
             ":t2": String($('#datetimes').data('daterangepicker').endDate.unix()),
-
         }
     };
 
@@ -231,6 +225,8 @@ function getData() {
             var humidityVals = [];
             var salinityVals = [];
             var pHVals = [];
+            var wavesVals = [];
+            var curSpdVals = [];
             var labelVals = [];
 
             // placeholders for the data read
@@ -239,7 +235,9 @@ function getData() {
             var humidity = 0.0;
             var salinity = 0.0;
             var pH = 0.0;
-            var time = "";
+            var waves = 0.0;
+            var curSpd = 0.0;
+            var timestamp = "";
 
             for (var i in data['Items']) {
                 // read the values from the dynamodb JSON packet
@@ -247,8 +245,10 @@ function getData() {
                 tempAir = parseFloat(data['Items'][i]['tempAir']);
                 humidity = parseFloat(data['Items'][i]['humidity']);
                 salinity = parseFloat(data['Items'][i]['salinity']);
-                pH = 7.8 + 0.06 * Math.floor(Math.random() * 10);
-                var timestamp = new Date(0);
+                pH = parseFloat(data['Items'][i]['pH']);
+                waves = parseFloat(data['Items'][i]['waves']);
+                curSpd = parseFloat(data['Items'][i]['curSpd']);
+                timestamp = new Date(0);
                 timestamp.setUTCSeconds(parseFloat(data['Items'][i]['timestamp']));
 
                 // append the read data to the data arrays
@@ -257,6 +257,8 @@ function getData() {
                 humidityVals.push(humidity);
                 salinityVals.push(salinity);
                 pHVals.push(pH);
+                curSpdVals.push(curSpd);
+                wavesVals.push(waves);
                 labelVals.push(timestamp);
             }
 
@@ -265,16 +267,22 @@ function getData() {
             humiditygraph.data.labels = labelVals;
             salinitygraph.data.labels = labelVals;
             pHgraph.data.labels = labelVals;
+            wavesgraph.data.labels = labelVals;
+            curSpdgraph.data.labels = labelVals;
             temperaturegraph.data.datasets[0].data = tempWaterVals;
             temperaturegraph.data.datasets[1].data = tempAirVals;
             humiditygraph.data.datasets[0].data = humidityVals;
             salinitygraph.data.datasets[0].data = salinityVals;
+            curSpdgraph.data.datasets[0].data = curSpdVals;
+            wavesgraph.data.datasets[0].data = wavesVals;
             pHgraph.data.datasets[0].data = pHVals;
 
             // redraw the graph canvas
             temperaturegraph.update();
             humiditygraph.update();
             salinitygraph.update();
+            wavesgraph.update();
+            curSpdgraph.update();
             pHgraph.update();
         }
     });
@@ -285,6 +293,8 @@ var tctx = $("#temperaturegraph").get(0).getContext("2d");
 var hctx = $("#humiditygraph").get(0).getContext("2d");
 var sctx = $("#salinitygraph").get(0).getContext("2d");
 var pHctx = $("#pHgraph").get(0).getContext("2d");
+var cSctx = $("#curSpdgraph").get(0).getContext("2d");
+var wctx = $("#wavesgraph").get(0).getContext("2d");
 
 
 /* Set the options for our line charts */
@@ -311,6 +321,74 @@ var options = {
         }],
         yAxes: [{
             ticks: {
+                fontSize: 14,
+                fontFamily: 'Circular Std Book',
+                fontColor: '#71748d',
+            }
+        }]
+    }
+};
+
+/* Set the options for our line charts */
+var h_options = {
+    legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+            fontColor: '#71748d',
+            fontFamily: 'Circular Std Book',
+            fontSize: 14,
+        }
+    },
+    responsive: true,
+    showLines: true,
+    scales: {
+        xAxes: [{
+            ticks: {
+                display: false,
+                fontSize: 14,
+                fontFamily: 'Circular Std Book',
+                fontColor: '#71748d',
+            }
+        }],
+        yAxes: [{
+            ticks: {
+                min: 0,
+                max: 100,
+                fontSize: 14,
+                fontFamily: 'Circular Std Book',
+                fontColor: '#71748d',
+            }
+        }]
+    }
+};
+
+/* Set the options for our line charts */
+var pH_options = {
+    legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+            fontColor: '#71748d',
+            fontFamily: 'Circular Std Book',
+            fontSize: 14,
+        }
+    },
+    responsive: true,
+    showLines: true,
+    scales: {
+        xAxes: [{
+            ticks: {
+                display: false,
+                fontSize: 14,
+                fontFamily: 'Circular Std Book',
+                fontColor: '#71748d',
+            }
+        }],
+        yAxes: [{
+            ticks: {
+                min: 6,
+                max: 10,
                 fontSize: 14,
                 fontFamily: 'Circular Std Book',
                 fontColor: '#71748d',
@@ -346,8 +424,8 @@ var h_init = {
     datasets: [
         {
             label: "Air Humidity %",
-            backgroundColor: "rgba(40, 200, 80, 0.5)",
-            borderColor: "rgba(40, 200, 80, 0.7)",
+            backgroundColor: "rgba(0, 140, 255, 0.5)",
+            borderColor: "rgba(0, 140, 255, 0.7)",
             borderWidth: 2,
             data: []
         }
@@ -374,8 +452,38 @@ var pH_init = {
     datasets: [
         {
             label: "pH Level",
-            borderColor: "rgba(50, 50, 50, 0.7)",
-            backgroundColor: "rgba(50, 50, 50, 0.5)",
+            borderColor: "rgba(255, 0, 0, 0.7)",
+            backgroundColor: "rgba(255, 0, 0, 0.5)",
+            fill: false,
+            borderWidth: 2,
+            data: [],
+        }
+    ]
+};
+
+
+/* Set the inital data */
+var w_init = {
+    labels: [],
+    datasets: [
+        {
+            label: "Wave Data ???",
+            borderColor: "rgba(255, 145, 0, 0.7)",
+            backgroundColor: "rgba(255, 145, 0, 0.5)",
+            borderWidth: 2,
+            data: [],
+        }
+    ]
+};
+
+/* Set the inital data */
+var cS_init = {
+    labels: [],
+    datasets: [
+        {
+            label: "Current Speed cm/s",
+            borderColor: "rgba(245, 100, 255, 0.7)",
+            backgroundColor: "rgba(245, 100, 255, 0.5)",
             borderWidth: 2,
             data: [],
         }
@@ -383,9 +491,11 @@ var pH_init = {
 };
 
 var temperaturegraph = new Chart.Line(tctx, { data: t_init, options: options });
-var humiditygraph = new Chart.Line(hctx, { data: h_init, options: options });
+var humiditygraph = new Chart.Line(hctx, { data: h_init, options: h_options });
 var salinitygraph = new Chart.Line(sctx, { data: s_init, options: options });
-var pHgraph = new Chart.Line(pHctx, { data: pH_init, options: options });
+var pHgraph = new Chart.Line(pHctx, { data: pH_init, options: pH_options });
+var wavesgraph = new Chart.Line(wctx, { data: w_init, options: options });
+var curSpdgraph = new Chart.Line(cSctx, { data: cS_init, options: options });
 
 $('#datetimes').on('apply.daterangepicker', function (ev, picker) {
     console.log("start: " + picker.startDate.unix());
@@ -393,3 +503,4 @@ $('#datetimes').on('apply.daterangepicker', function (ev, picker) {
     timerangeStart = String(picker.startDate.unix());
     timerangeEnd = String(picker.endDate.unix());
 });
+

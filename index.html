@@ -20,7 +20,7 @@
     <title>Algaelytics</title>
 </head>
 
-<body onload="checkLogin()">
+<body onload="checkLogin(); getData();">
     <!-- ============================================================== -->
     <!-- main wrapper -->
     <!-- ============================================================== -->
@@ -53,14 +53,14 @@
                                 <a class="dropdown-item" href="#"><i class="fas fa-user mr-2"></i>Account</a>
                                 <a class="dropdown-item" href="#"><i class="fas fa-cog mr-2"></i>Setting</a>
                                 -->
-                                <!-- -->
+                                <!-- 
                                 <a class="dropdown-item"
                                     href="https://algaelytics.auth.ca-central-1.amazoncognito.com/login?client_id=rr1puarvl8edm9e4ofmocfrjf&response_type=token&scope=phone+email+openid+aws.cognito.signin.user.admin+profile&redirect_uri=http://localhost:8080"
                                     id="loginBtn"><i class="fas fa-power-off mr-2"></i>Login</a>
-                                <!-- -->
-                                <!--
+                                 -->
+                                <!---->
                                     <a class="dropdown-item" href="https://algaelytics.auth.ca-central-1.amazoncognito.com/login?client_id=rr1puarvl8edm9e4ofmocfrjf&response_type=token&scope=phone+email+openid+aws.cognito.signin.user.admin+profile&redirect_uri=https://algaelytics-web.s3.ca-central-1.amazonaws.com/index.html" id="loginBtn"><i class="fas fa-power-off mr-2"></i>Login</a>
-                                -->
+                                <!---->
                             </div>
                         </li>
                     </ul>
@@ -96,17 +96,16 @@
                                 <div id="submenu-1" class="collapse submenu" style="">
                                     <ul class="nav flex-column">
                                         <li class="nav-item">
-                                            <a id="a-index" class="nav-link" href="/index.html">Historical</a>
+                                            <a id="a-index" class="nav-link" href="/index.html">Realtime</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a id="a-realtime" class="nav-link" href="/realtime.html">Realtime</a>
+                                            <a id="a-historical" class="nav-link" href="/historical.html">Historical</a>
                                         </li>
-                                        
                                     </ul>
                                 </div>
                             </li>
                             <li class="nav-item">
-                                <a id="a-map" class="nav-link" href="/map.html"><i class="fas fa-fw fa-map"></i>Device Map</a>
+                                <a id="a-map" class="nav-link" href="#"><i class="fas fa-fw fa-map"></i>Device Map</a>
                             </li>
 
                             <li class="nav-item">
@@ -128,7 +127,7 @@
                                 <div id="submenu-5" class="collapse submenu" style="">
                                     <ul class="nav flex-column">
                                         <li class="nav-item">
-                                            <a class="nav-link" href="pages/data-tables.html">Data Tables</a>
+                                            <a class="nav-link" href="/pages/data-tables.html">Data Tables</a>
                                         </li>
                                     </ul>
                                 </div>
@@ -165,15 +164,16 @@
                     <div class="row">
                         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                             <div class="page-header">
-                                <h2 class="pageheader-title">Historical Dashboard</h2>
+                                <h2 class="pageheader-title">Realtime Dashboard</h2>
                                 <p class="pageheader-text">Nulla euismod urna eros, sit amet scelerisque torton lectus
                                     vel mauris facilisis faucibus at enim quis massa lobortis rutrum.</p>
                                 <div class="page-breadcrumb">
                                     <nav aria-label="breadcrumb">
                                         <ol class="breadcrumb">
                                             <li class="breadcrumb-item"><a href="#"
-                                                    class="breadcrumb-link">Device Map</a></li>
-                                            <li class="breadcrumb-item active" aria-current="page">Historical Dashboard</li>
+                                                    class="breadcrumb-link">Dashboard</a></li>
+                                            <li class="breadcrumb-item active" aria-current="page">Realtime Dashboard
+                                            </li>
                                         </ol>
                                     </nav>
                                 </div>
@@ -183,6 +183,30 @@
                     <!-- ============================================================== -->
                     <!-- end pageheader  -->
                     <!-- ============================================================== -->
+
+
+                    <div class="row" id="loginSplash" style="display: none;">
+
+                        <!-- ============================================================== -->
+                        <!-- login splash page  -->
+                        <!-- ============================================================== -->
+                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                            <div class="card">
+                                <h5 class="card-header">You don't have permission to see this data...</h5>
+                                <div class="card-body">
+                                    Please login using the account interface in the top right of your screen.
+                                </div>
+                            </div>
+                        </div>
+                        <!-- ============================================================== -->
+                        <!-- end login splash page  -->
+                        <!-- ============================================================== -->
+
+                    </div>
+
+
+
+
                     <div id="pageContent" style="display: none;">
                         <div class="ecommerce-widget">
 
@@ -192,25 +216,16 @@
                                 <!-- ============================================================== -->
                                 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                                     <div class="card">
-                                        <h5 class="card-header">Query Selector<span><input type="button"
-                                                    value="Submit Query" onclick="getData();" class="btn btn-primary"
-                                                    style="float: right;" /></span></h5>
-                                        <div class="card-body">
-                                            <div class="form-row">
-                                                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
-                                                    <label for="input-select">Device Select</label>
-                                                    <select class="form-control" id="input-select">
-                                                        <option value="864475040553264">864475040553264</option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 mb-2">
-                                                    <label for="datetimes">Date and Time Range</label>
-                                                    <input type="text" id="datetimes" name="datetimes"
-                                                        class="form-control">
-                                                    </input>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <h5 class="card-header">Query Selector
+                                            <span>
+                                                <input type="button" value="Select Device" onclick="getData();"
+                                                    class="btn btn-primary" style="float: right;" />
+                                                <select class="form-control" id="input-select"
+                                                    style="float: right; width: 25%; margin-right: 10px;">
+                                                    <option value="864475040553264">864475040553264</option>
+                                                </select>
+                                            </span>
+                                        </h5>
                                     </div>
                                 </div>
                                 <!-- ============================================================== -->
@@ -251,7 +266,6 @@
                                 <!-- end line chart  -->
                                 <!-- ============================================================== -->
 
-
                             </div>
 
                             <div class="row">
@@ -287,6 +301,38 @@
                                 <!-- ============================================================== -->
                             </div>
 
+                            <div class="row">
+                                <!-- ============================================================== -->
+                                <!-- line chart  -->
+                                <!-- ============================================================== -->
+                                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                    <div class="card">
+                                        <h5 class="card-header">Current Speed</h5>
+                                        <div class="card-body">
+                                            <canvas id="curSpdgraph"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- ============================================================== -->
+                                <!-- end line chart  -->
+                                <!-- ============================================================== -->
+
+                                <!-- ============================================================== -->
+                                <!-- line chart  -->
+                                <!-- ============================================================== -->
+                                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                    <div class="card">
+                                        <h5 class="card-header">Exposure to Wave Action</h5>
+                                        <div class="card-body">
+                                            <canvas id="wavesgraph"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- ============================================================== -->
+                                <!-- end line chart  -->
+                                <!-- ============================================================== -->
+                            </div>
+
                             <!-- ============================================================== -->
                             <!-- simple database read function  -->
                             <!-- ============================================================== -->
@@ -307,8 +353,6 @@
                             <!-- ============================================================== -->
                             <!-- end simple database read function  -->
                             <!-- ============================================================== -->
-
-
 
 
                         </div>

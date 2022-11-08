@@ -85,18 +85,6 @@ jQuery(document).ready(function ($) {
 
     }
 
-    // ============================================================== 
-    // Date time range picker
-    // ============================================================== 
-    $('input[name="datetimes"]').daterangepicker({
-        timePicker: true,
-        startDate: moment().startOf('hour').subtract(24 * 14, 'hour'),
-        endDate: moment().startOf('hour'),
-        locale: {
-            format: 'M/DD hh:mm A'
-        }
-    });
-
 }); // END OF JQUERY
 
 
@@ -109,15 +97,14 @@ jQuery(document).ready(function ($) {
 
 function changeLoginToLogoutURL() {
     document.getElementById("loginBtn").href = "https://algaelytics.auth.ca-central-1.amazoncognito.com/logout?client_id=rr1puarvl8edm9e4ofmocfrjf&logout_uri=https://algaelytics-web.s3.ca-central-1.amazonaws.com/index.html";
-    document.getElementById("loginBtn").href = "https://algaelytics.auth.ca-central-1.amazoncognito.com/logout?client_id=rr1puarvl8edm9e4ofmocfrjf&logout_uri=http://localhost:8080";
+    //document.getElementById("loginBtn").href = "https://algaelytics.auth.ca-central-1.amazoncognito.com/logout?client_id=rr1puarvl8edm9e4ofmocfrjf&logout_uri=http://localhost:8080";
 }
 
 function appendTokenToURL() {
     var url_string = window.location.href;
-    document.getElementById("a-realtime").href = "/realtime.html/" + url_string.substring(url_string.indexOf("#"));
-    document.getElementById("a-map").href = "/map.html/" + url_string.substring(url_string.indexOf("#"));
-    document.getElementById("a-index").href = "/index.html/" + url_string.substring(url_string.indexOf("#"));
-
+    document.getElementById("a-index").href = "/index.html" + url_string.substring(url_string.indexOf("#"));
+    document.getElementById("a-map").href = "/map.html" + url_string.substring(url_string.indexOf("#"));
+    document.getElementById("a-historical").href = "/historical.html" + url_string.substring(url_string.indexOf("#"));
 }
 
 // ============================================================== 
@@ -139,6 +126,7 @@ function checkLogin() {
         document.getElementById("signinName").innerHTML = parsedIdToken.name;
         document.getElementById("loginBtn").innerHTML = "<i class=\"fas fa-power-off mr-2\"></i>Logout";
         document.getElementById("pageContent").style.display = "block";
+        document.getElementById("loginSplash").style.display = "none";
         appendTokenToURL();
         changeLoginToLogoutURL();
         auth();
@@ -148,6 +136,7 @@ function checkLogin() {
         document.getElementById("signinName").innerHTML = "-";
         document.getElementById("loginBtn").innerHTML = "<i class=\"fas fa-power-off mr-2\"></i>Login";
         document.getElementById("pageContent").style.display = "none";
+        document.getElementById("loginSplash").style.display = "block";
     }
 }
 

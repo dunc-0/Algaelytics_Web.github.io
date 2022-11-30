@@ -152,23 +152,6 @@ function auth() {
     });
 }
 
-function readItem() {
-    var docClient = new AWS.DynamoDB.DocumentClient();
-    var params = {
-        TableName: "SensorStor",
-        Key: {
-            "EventID": "80ad1045-b637-4901-ab86-eb654a75ad2a", // Partition Key
-        }
-    };
-    docClient.get(params, function (err, data) {
-        if (err) {
-            document.getElementById('textarea').innerHTML = "Unable to read item: " + "\n" + JSON.stringify(err, undefined, 2);
-        } else {
-            document.getElementById('textarea').innerHTML = "GetItem succeeded: " + "\n" + JSON.stringify(data, undefined, 2);
-        }
-    });
-}
-
 function parseJwt(token) {
     var base64Url = token.split('.')[1];
     var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -405,14 +388,14 @@ var t_init = {
     labels: [],
     datasets: [
         {
-            label: "Water Temperature °C",
+            label: "Water Temperature (°C)",
             backgroundColor: "rgba(89, 105, 255,0.5)",
             borderColor: "rgba(89, 105, 255,0.7)",
             borderWidth: 2,
             data: []
         },
         {
-            label: "Air Temperature °C",
+            label: "Air Temperature (°C)",
             backgroundColor: "rgba(255, 64, 123,0.5)",
             borderColor: "rgba(255, 64, 123,0.7)",
             borderWidth: 2,
@@ -426,7 +409,7 @@ var h_init = {
     labels: [],
     datasets: [
         {
-            label: "Air Humidity %",
+            label: "Air Humidity (%)",
             backgroundColor: "rgba(0, 140, 255, 0.5)",
             borderColor: "rgba(0, 140, 255, 0.7)",
             borderWidth: 2,
@@ -440,7 +423,7 @@ var s_init = {
     labels: [],
     datasets: [
         {
-            label: "Salinity ppm",
+            label: "Total Dissolved Solids (ppm)",
             backgroundColor: "rgba(40, 200, 80, 0.5)",
             borderColor: "rgba(40, 200, 80, 0.7)",
             borderWidth: 2,
@@ -470,7 +453,7 @@ var w_init = {
     labels: [],
     datasets: [
         {
-            label: "Wave Data ???",
+            label: "Wave Data (m)",
             borderColor: "rgba(255, 145, 0, 0.7)",
             backgroundColor: "rgba(255, 145, 0, 0.5)",
             borderWidth: 2,
@@ -484,7 +467,7 @@ var cS_init = {
     labels: [],
     datasets: [
         {
-            label: "Current Speed cm/s",
+            label: "Current Speed (cm/s)",
             borderColor: "rgba(245, 100, 255, 0.7)",
             backgroundColor: "rgba(245, 100, 255, 0.5)",
             borderWidth: 2,
